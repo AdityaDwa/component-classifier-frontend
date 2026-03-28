@@ -1,0 +1,159 @@
+/* ── Backdrop ─────────────────────────────────────────────────────────────── */
+.sdialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: sdialog-fade 0.15s ease;
+}
+
+@keyframes sdialog-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Box ──────────────────────────────────────────────────────────────────── */
+.sdialog-box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 400px;
+  animation: sdialog-up 0.18s ease;
+}
+
+@keyframes sdialog-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.sdialog-header {
+  margin-bottom: 1.25rem;
+}
+
+.sdialog-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 4px;
+  font-family: system-ui, sans-serif;
+}
+
+.sdialog-subtitle {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+/* ── Field ────────────────────────────────────────────────────────────────── */
+.sdialog-field {
+  margin-bottom: 1.25rem;
+}
+
+.sdialog-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+  font-family: system-ui, sans-serif;
+}
+
+.sdialog-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.sdialog-input {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-family: system-ui, sans-serif;
+  color: #111;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.sdialog-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.sdialog-input--error {
+  border-color: #ef4444;
+}
+
+.sdialog-input--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+/* footer row — error on left, char count on right */
+.sdialog-field-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+  min-height: 18px;
+}
+
+.sdialog-error-msg {
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-family: system-ui, sans-serif;
+}
+
+.sdialog-char-count {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-family: system-ui, sans-serif;
+}
+
+/* ── Actions ──────────────────────────────────────────────────────────────── */
+.sdialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.sdialog-cancel-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  transition: border-color 0.12s, color 0.12s;
+}
+.sdialog-cancel-btn:hover    { border-color: #d1d5db; color: #374151; }
+.sdialog-cancel-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.sdialog-save-btn {
+  padding: 8px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  transition: background 0.12s;
+}
+.sdialog-save-btn:hover    { background: #4f46e5; }
+.sdialog-save-btn:disabled { background: #a5b4fc; cursor: not-allowed; }

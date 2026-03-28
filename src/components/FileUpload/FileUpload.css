@@ -1,0 +1,242 @@
+.fu-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  font-family: system-ui, sans-serif;
+}
+
+/* Header */
+.fu-header {
+  margin-bottom: 1.75rem;
+}
+.fu-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 4px;
+}
+.fu-header p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Drop zone */
+.fu-dropzone {
+  border: 1.5px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  background: #fafafa;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+  outline: none;
+  user-select: none;
+}
+.fu-dropzone:hover,
+.fu-dropzone:focus-visible {
+  border-color: #6366f1;
+  background: #f5f3ff;
+}
+.fu-dropzone--active {
+  border-color: #6366f1;
+  background: #eef2ff;
+}
+
+.fu-dropzone__icon {
+  color: #9ca3af;
+  margin-bottom: 0.875rem;
+  transition: color 0.15s;
+}
+.fu-dropzone--active .fu-dropzone__icon,
+.fu-dropzone:hover .fu-dropzone__icon {
+  color: #6366f1;
+}
+
+.fu-dropzone__title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #374151;
+  margin: 0 0 4px;
+}
+.fu-dropzone__sub {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  display: block;
+  margin-bottom: 0.875rem;
+}
+
+/* Browse button */
+.fu-browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition:
+    border-color 0.12s,
+    background 0.12s;
+}
+.fu-browse-btn:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+  background: #f5f3ff;
+}
+
+/* Error messages */
+.fu-errors {
+  margin-top: 0.875rem;
+}
+.fu-error {
+  font-size: 0.8125rem;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin: 4px 0;
+}
+
+/* File grid */
+.fu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+/* File card */
+.fu-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow 0.12s;
+}
+.fu-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.fu-card__thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+.fu-card__placeholder {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  font-size: 2rem;
+}
+.fu-card__info {
+  padding: 6px 8px 8px;
+}
+.fu-card__name {
+  display: block;
+  font-size: 0.75rem;
+  color: #374151;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fu-card__size {
+  display: block;
+  font-size: 0.6875rem;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* Remove button */
+.fu-card__remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.12s;
+  padding: 0;
+}
+.fu-card:hover .fu-card__remove {
+  opacity: 1;
+}
+
+/* Footer */
+.fu-footer {
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.fu-footer__count {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+.fu-footer__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.fu-clear-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 0.875rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition:
+    border-color 0.12s,
+    color 0.12s;
+  font-family: inherit;
+}
+.fu-clear-btn:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.fu-upload-btn {
+  padding: 8px 22px;
+  border-radius: 8px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+.fu-upload-btn:hover {
+  background: #4f46e5;
+}
+.fu-upload-btn:active {
+  background: #4338ca;
+}
+.fu-upload-btn:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
