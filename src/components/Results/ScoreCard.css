@@ -4,10 +4,47 @@
   border-radius: 14px;
   padding: 1.25rem;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
+  flex-direction: column;
   gap: 1.25rem;
   transition: box-shadow 0.15s;
 }
+
+.sc-card section {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.sc-card aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-content: start;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.issue-number {
+  font-weight: 600;
+}
+
+.title-issue {
+  font-weight: 300;
+}
+
+.sc-card aside div {
+  display: flex;
+  gap: 1rem;
+}
+
+.issues {
+  flex-direction: column;
+  gap: 0.1rem !important;
+  margin-bottom: 0.5rem;
+}
+
 .sc-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
 }

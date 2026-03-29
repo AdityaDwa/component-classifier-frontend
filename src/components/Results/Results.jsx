@@ -22,7 +22,7 @@ export default function Results({
   const saveBlocked = isGuest; // always prompt guests, regardless of timer
   const scoreEntries = [
     { key: "clutter", val: clutter.score },
-    { key: "alignment", val: alignment.score },
+    { key: "alignment", val: alignment.score * 100 },
     { key: "colorContrast", val: contrast.average_contrast },
   ];
   return (
@@ -45,11 +45,11 @@ export default function Results({
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           {/* Overall score */}
           <div className="res-overall">
-            <span className="res-overall-label">Overall score</span>
+            {/* <span className="res-overall-label">Overall score</span>
             <span className="res-overall-score">
               {avg}
               <span className="res-overall-max">/100</span>
-            </span>
+            </span> */}
           </div>
 
           {/* Save button */}
@@ -160,16 +160,16 @@ export default function Results({
             </span>
             UI quality scores
           </div>
-          <p className="res-section-sub">Each criterion is rated out of 100</p>
+          {/* <p className="res-section-sub">Each criterion is rated out of 100</p> */}
 
           <div className="res-scores-list">
             {scoreEntries.map(({ key, val }) => (
-              <ScoreCard key={key} criteriaKey={key} score={val} />
+              <ScoreCard key={key} criteriaKey={key} score={val} data={data} />
             ))}
           </div>
 
           {/* Summary strip */}
-          <div className="res-summary">
+          {/* <div className="res-summary">
             <div className="res-summary-row">
               <span>Clutter</span>
               <span className="res-summary-val">{clutter.score}</span>
@@ -188,7 +188,7 @@ export default function Results({
               <span>Average</span>
               <span className="res-summary-val">{avg}</span>
             </div>
-          </div>
+          </div> */}
         </section>
       </div>
     </div>
