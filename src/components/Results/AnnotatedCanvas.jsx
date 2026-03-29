@@ -1,137 +1,246 @@
 import { useEffect, useRef, useState } from "react";
 import "./AnnotatedCanvas.css";
 
-const COLORS = [
-  "#6366f1",
-  "#f59e0b",
-  "#10b981",
-  "#ef4444",
-  "#3b82f6",
-  "#ec4899",
-  "#8b5cf6",
-  "#14b8a6",
-];
+// ── 14 component classes — keys match exactly what the backend sends ──────────
+const CLASS_COLORS = {
+  "heading":    "#6366f1", // indigo
+  "link":       "#f59e0b", // amber
+  "image":      "#3b82f6", // blue
+  "text":       "#10b981", // emerald
+  "list":       "#ec4899", // pink
+  "header":     "#ef4444", // red
+  "footer":     "#78716c", // stone
+  "table":      "#64748b", // slate
+  "input":      "#14b8a6", // teal
+  "button":     "#f97316", // orange
+  "navigation": "#8b5cf6", // violet
+  "sidebar":    "#06b6d4", // cyan
+  "dialog":     "#a855f7", // purple
+  "container":  "#84cc16", // lime
+};
 
+const FALLBACK_COLOR = "#9ca3af"; // gray — for any label not in the map
+
+function getColor(label) {
+  return CLASS_COLORS[label] || FALLBACK_COLOR;
+}
+
+// returns unique labels in the order they first appear in the components array
+function getUniqueClasses(components) {
+  const seen    = new Set();
+  const classes = [];
+  components.forEach((comp) => {
+    if (!seen.has(comp.class)) {
+      seen.add(comp.class);
+      classes.push(comp.class);
+    }
+  });
+  return classes;
+}
+
+//Component 
 export default function AnnotatedCanvas({ imageUrl, components }) {
-  const canvasRef = useRef(null);
+  const canvasRef  = useRef(null);
   const wrapperRef = useRef(null);
-  const [hovered, setHovered] = useState(null); // component id
-  const [canvasSize, setCanvasSize] = useState({ w: 0, h: 0 });
 
-  // Draw whenever imageUrl, components, or hovered changes
+    // store original image dimensions so handleMouseMove can normalize coords
+    // useRef because changing these should NOT cause a re-render
+    const naturalWidthRef  = useRef(0);
+    const naturalHeightRef = useRef(0);
+
+  // hoveredId   — id of a single box being hovered on the canvas
+  // activeClass — label clicked in the legend (highlights ALL boxes of that class)
+  const [hoveredId, setHoveredId]     = useState(null);
+  const [activeClass, setActiveClass] = useState(null);
+
+  const uniqueClasses = getUniqueClasses(components);
+
+  // ── helper — converts absolute bbox coords to canvas pixel coords ─────────
+  // called in both the draw loop and the hit test
+  // naturalW/naturalH = original image pixel dimensions from img.naturalWidth/Height
+  // canvasW/canvasH   = actual canvas drawing dimensions (scaled to fit wrapper)
+  function toCanvasCoords(comp, naturalW, naturalH, canvasW, canvasH) {
+    // step 1 — normalize: divide by original image dimensions to get 0-1 values
+    const normX = comp.bbox.x      / naturalW;
+    const normY = comp.bbox.y      / naturalH;
+    const normW = comp.bbox.width  / naturalW;
+    const normH = comp.bbox.height / naturalH;
+
+    // step 2 — scale to canvas: multiply by canvas dimensions
+    return {
+      x: normX * canvasW,
+      y: normY * canvasH,
+      w: normW * canvasW,
+      h: normH * canvasH,
+    };
+  }
+  // ── Draw ──────────────────────────────────────────────────────────────────
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvas  = canvasRef.current;
     const wrapper = wrapperRef.current;
     if (!canvas || !wrapper) return;
 
     const ctx = canvas.getContext("2d");
     const img = new Image();
-    // img.crossOrigin = "anonymous";
-    img.src = imageUrl;
+    img.src   = imageUrl;
 
     img.onload = () => {
-      // Fit image inside wrapper width while keeping aspect ratio
-      const maxW = wrapper.clientWidth;
+       // img.naturalWidth/Height are the original pixel dimensions of the image
+      // e.g. if the image is 1920x1080, naturalWidth=1920, naturalHeight=1080
+      const naturalW = img.naturalWidth;
+      const naturalH = img.naturalHeight;
+
+      // store in refs so handleMouseMove can access them without a re-render
+      naturalWidthRef.current  = naturalW;
+      naturalHeightRef.current = naturalH;
+
+      // scale image to fit wrapper width, preserve aspect ratio
+      const maxW  = wrapper.clientWidth;
       const scale = maxW / img.naturalWidth;
-      const W = Math.round(img.naturalWidth * scale);
-      const H = Math.round(img.naturalHeight * scale);
+      const W     = Math.round(img.naturalWidth  * scale);
+      const H     = Math.round(img.naturalHeight * scale);
 
-      canvas.width = W;
+      canvas.width  = W;
       canvas.height = H;
-      setCanvasSize({ w: W, h: H });
 
-      // Draw base image
+      // 1. draw the base image
       ctx.drawImage(img, 0, 0, W, H);
 
-      // Draw bounding boxes
-      components.forEach((comp, i) => {
-        const color = COLORS[i % COLORS.length];
-        const x = comp.x * W;
-        const y = comp.y * H;
-        const w = comp.width * W;
-        const h = comp.height * H;
+      // 2. draw bounding boxes on top
+      components.forEach((comp) => {
+        const color = getColor(comp.class); // color by class label
 
-        const isHovered = hovered === comp.id;
-        const alpha = hovered === null ? 1 : isHovered ? 1 : 0.35;
+              // convert absolute pixel bbox coords → canvas pixel coords
+        const { x, y, w, h } = toCanvasCoords(comp, naturalW, naturalH, W, H);
+
+        // ── alpha logic ───────────────────────────────────────────────────
+        // activeClass takes priority over hoveredId
+        // if a legend class is selected → dim everything not in that class
+        // else if a box is hovered      → dim everything except that box
+        // else                          → all boxes full opacity
+        let alpha = 1;
+        if (activeClass !== null) {
+          alpha = comp.class === activeClass ? 1 : 0.2;
+        } else if (hoveredId !== null) {
+          alpha = comp.id === hoveredId ? 1 : 0.35;
+        }
 
         ctx.globalAlpha = alpha;
 
-        // Box fill
-        ctx.fillStyle = color + "22"; // ~13% opacity fill
+        // box fill — color at ~13% opacity
+        ctx.fillStyle = color + "22";
         ctx.fillRect(x, y, w, h);
 
-        // Box stroke
+        // box border — thicker on the individually hovered box
         ctx.strokeStyle = color;
-        ctx.lineWidth = isHovered ? 2.5 : 1.5;
+        ctx.lineWidth   = comp.id === hoveredId ? 2.5 : 1.5;
         ctx.strokeRect(x, y, w, h);
 
-        // Label pill
-        const label = comp.label;
+        // ── label pill ────────────────────────────────────────────────────
         const fontSize = Math.max(11, Math.min(13, W * 0.016));
-        ctx.font = `500 ${fontSize}px system-ui, sans-serif`;
-        const textW = ctx.measureText(label).width;
-        const padX = 7,
-          padY = 4;
-        const pillH = fontSize + padY * 2;
-        const pillY = y - pillH - 2 < 0 ? y + 2 : y - pillH - 2;
+        ctx.font       = `500 ${fontSize}px system-ui, sans-serif`;
+        const textW    = ctx.measureText(comp.class).width;
+        const padX     = 7;
+        const padY     = 4;
+        const pillH    = fontSize + padY * 2;
+        // flip pill below the box if it would go off the top of the canvas
+        const pillY    = y - pillH - 2 < 0 ? y + 2 : y - pillH - 2;
 
+        // pill background
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.roundRect(x, pillY, textW + padX * 2, pillH, 4);
         ctx.fill();
 
-        ctx.fillStyle = "#fff";
+        // pill text
+        ctx.fillStyle   = "#fff";
         ctx.globalAlpha = alpha;
-        ctx.fillText(label, x + padX, pillY + pillH - padY - 1);
+        ctx.fillText(comp.class, x + padX, pillY + pillH - padY - 1);
 
+        // always reset alpha after drawing each box
         ctx.globalAlpha = 1;
       });
     };
-  }, [imageUrl, components, hovered]);
+  }, [imageUrl, components, hoveredId, activeClass]);
 
-  // Hit-test on mouse move
+  // ── Canvas hit test — individual box hover ────────────────────────────────
   const handleMouseMove = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    
+    // naturalWidth/Height stored in refs during img.onload above
+    const naturalW = naturalWidthRef.current;
+    const naturalH = naturalHeightRef.current;
+
+    // guard — if image hasn't loaded yet, refs are still 0
+    if (!naturalW || !naturalH) return;
+
     const rect = canvas.getBoundingClientRect();
-    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+    // correct for difference between CSS display size and canvas resolution
+    const mx = (e.clientX - rect.left)  * (canvas.width  / rect.width);
+    const my = (e.clientY - rect.top)   * (canvas.height / rect.height);
 
     const hit = components.find((comp) => {
-      const x = comp.x * canvas.width;
-      const y = comp.y * canvas.height;
-      const w = comp.width * canvas.width;
-      const h = comp.height * canvas.height;
+      // same normalization applied here for consistent hit detection
+      const { x, y, w, h } = toCanvasCoords(
+        comp,
+        naturalW,
+        naturalH,
+        canvas.width,
+        canvas.height
+      );
       return mx >= x && mx <= x + w && my >= y && my <= y + h;
     });
-    setHovered(hit ? hit.id : null);
+
+    setHoveredId(hit ? hit.id : null);
   };
 
+  // ── Legend click — toggle active class ───────────────────────────────────
+  function handleLegendClick(label) {
+    // clicking the already-active class deselects it
+    setActiveClass((prev) => (prev === label ? null : label));
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="ac-wrapper" ref={wrapperRef}>
+
       <canvas
         ref={canvasRef}
         className="ac-canvas"
         onMouseMove={handleMouseMove}
-        onMouseLeave={() => setHovered(null)}
+        onMouseLeave={() => setHoveredId(null)}
       />
-      {/* Component legend */}
+
+      {/* legend — one pill per unique class found in this image */}
       <div className="ac-legend">
-        {components.map((comp, i) => (
-          <div
-            key={comp.id}
-            className={`ac-legend-item ${hovered === comp.id ? "ac-legend-item--active" : ""}`}
-            onMouseEnter={() => setHovered(comp.id)}
-            onMouseLeave={() => setHovered(null)}
-          >
-            <span
-              className="ac-legend-dot"
-              style={{ background: COLORS[i % COLORS.length] }}
-            />
-            <span className="ac-legend-label">{comp.label}</span>
-          </div>
-        ))}
+        {uniqueClasses.map((label) => {
+          const count    = components.filter((c) => c.class === label).length;
+          const color    = getColor(label);
+          const isActive = activeClass === label;
+
+          return (
+            <div
+              key={label}
+              className={`ac-legend-item ${isActive ? "ac-legend-item--active" : ""}`}
+              onClick={() => handleLegendClick(label)}
+              title={`Click to highlight all ${label} elements`}
+            >
+              <span className="ac-legend-dot" style={{ background: color }} />
+              <span className="ac-legend-label">{label}</span>
+              {/* count badge — only shown when more than one of this class exists */}
+              {count > 1 && (
+                <span className="ac-legend-count">{count}</span>
+              )}
+            </div>
+          );
+        })}
       </div>
+
+      <p className="ac-hint">
+        Hover a box to inspect · Click a label to highlight all of that type
+      </p>
+
     </div>
   );
 }

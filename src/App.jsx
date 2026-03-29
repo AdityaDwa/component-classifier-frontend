@@ -166,7 +166,7 @@ export default function App() {
       const data = await res.json();
       console.log(res.status);
       if (!res.ok) throw new Error(data.message);
-
+      console.log(data.data);
       setResults(data.data);
       setView("results");
     } catch (err) {

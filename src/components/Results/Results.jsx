@@ -12,15 +12,19 @@ export default function Results({
   isGuest,
   sessionExpired,
 }) {
-  const { imageUrl, components, scores } = data;
+  const { imageUrl, components, clutter, alignment, contrast } = data;
 
   const avg = Math.round(
-    (scores.clutter + scores.alignment + scores.colorContrast) / 3,
+    (clutter.score + alignment.score + contrast.average_contrast) / 3,
   );
 
   // Save button is visually different for guests to hint they need to sign in
   const saveBlocked = isGuest; // always prompt guests, regardless of timer
-
+  const scoreEntries = [
+    { key: "clutter", val: clutter.score },
+    { key: "alignment", val: alignment.score },
+    { key: "colorContrast", val: contrast.average_contrast },
+  ];
   return (
     <div className="res-page">
       {/* Top bar */}
@@ -53,10 +57,8 @@ export default function Results({
             className={`res-save-btn ${saveBlocked ? "res-save-btn--guest" : ""} ${data.isSaved ? "res-save-btn--disabled" : ""}`}
             onClick={onSave}
             type="button"
-            disabled = {data.isSaved}
-            title={
-              saveBlocked ? "Sign in to save your results" : "Save result"
-            }
+            disabled={data.isSaved}
+            title={saveBlocked ? "Sign in to save your results" : "Save result"}
           >
             {saveBlocked ? (
               <>
@@ -161,7 +163,7 @@ export default function Results({
           <p className="res-section-sub">Each criterion is rated out of 100</p>
 
           <div className="res-scores-list">
-            {Object.entries(scores).map(([key, val]) => (
+            {scoreEntries.map(({ key, val }) => (
               <ScoreCard key={key} criteriaKey={key} score={val} />
             ))}
           </div>
@@ -170,15 +172,17 @@ export default function Results({
           <div className="res-summary">
             <div className="res-summary-row">
               <span>Clutter</span>
-              <span className="res-summary-val">{scores.clutter}</span>
+              <span className="res-summary-val">{clutter.score}</span>
             </div>
             <div className="res-summary-row">
               <span>Alignment</span>
-              <span className="res-summary-val">{scores.alignment}</span>
+              <span className="res-summary-val">{alignment.score}</span>
             </div>
             <div className="res-summary-row">
               <span>Color Contrast</span>
-              <span className="res-summary-val">{scores.colorContrast}</span>
+              <span className="res-summary-val">
+                {contrast.average_contrast}
+              </span>
             </div>
             <div className="res-summary-row res-summary-total">
               <span>Average</span>

@@ -11,6 +11,7 @@
   cursor: crosshair;
 }
 
+/* ── Legend ───────────────────────────────────────────────────────────────── */
 .ac-legend {
   display: flex;
   flex-wrap: wrap;
@@ -33,11 +34,19 @@
   user-select: none;
 }
 
-.ac-legend-item:hover,
-.ac-legend-item--active {
+.ac-legend-item:hover {
   border-color: #6366f1;
   background: #f5f3ff;
   color: #4f46e5;
+}
+
+/* active = clicked/selected class — stays highlighted until clicked again */
+.ac-legend-item--active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #4f46e5;
+  /* slightly thicker border to distinguish from hover */
+  border-width: 1.5px;
 }
 
 .ac-legend-dot {
@@ -49,4 +58,29 @@
 
 .ac-legend-label {
   font-weight: 500;
+}
+
+/* count badge — shows number of boxes for that class when > 1 */
+.ac-legend-count {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 99px;
+  /* inherits color change from parent hover/active */
+}
+
+.ac-legend-item:hover .ac-legend-count,
+.ac-legend-item--active .ac-legend-count {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+/* ── Hint text ────────────────────────────────────────────────────────────── */
+.ac-hint {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 8px;
+  font-family: system-ui, sans-serif;
 }
