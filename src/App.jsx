@@ -24,7 +24,7 @@ const MOCK_RESPONSE = {
   scores: { clutter: 72, alignment: 88, colorContrast: 65 },
 };
 
-//Guest helpers 
+//Guest helpers
 function getOrCreateGuestId() {
   let id = localStorage.getItem("guestId");
   if (!id) {
@@ -37,17 +37,17 @@ function clearGuestId() {
   localStorage.removeItem("guestId");
 }
 
-//App 
+//App
 export default function App() {
-  //Auth 
+  //Auth
   const [token, setToken] = useState(() => localStorage.getItem("accessToken"));
 
-  //Guest 
+  //Guest
   const [guestId, setGuestId] = useState(() => localStorage.getItem("guestId"));
   const [sessionExpired, setSessionExpired] = useState(false);
   const guestTimerRef = useRef(null);
 
-  //Modal 
+  //Modal
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [modalReason, setModalReason] = useState(null);
 
@@ -80,7 +80,7 @@ export default function App() {
     };
   }, []);
 
-  //Guest timer 
+  //Guest timer
   function startGuestTimer() {
     if (guestTimerRef.current) return;
     guestTimerRef.current = setTimeout(() => {
@@ -97,7 +97,7 @@ export default function App() {
     }
   }
 
-  //Sidebar toggle 
+  //Sidebar toggle
   function handleToggleCollapse() {
     setSidebarCollapsed((prev) => {
       const next = !prev;
@@ -134,7 +134,7 @@ export default function App() {
     setModalReason(null);
   }
 
-  //Evaluate 
+  //Evaluate
   async function handleEvaluate(files) {
     if (!token && sessionExpired) {
       setModalReason("timer");
@@ -176,7 +176,7 @@ export default function App() {
     }
   }
 
-  //Save flow 
+  //Save flow
   function handleSaveClick() {
     if (!token) {
       setModalReason("save");
@@ -206,14 +206,16 @@ export default function App() {
     }
   }
 
-  //Open a saved evaluation 
+  //Open a saved evaluation
   function handleOpenSaved(evaluation) {
     // load the saved data into results and switch to results view
     setResults({
       imageUrl: evaluation.imageUrl,
       components: evaluation.components,
-      scores: evaluation.scores,
-      isSaved :true,
+      clutter: evaluation.clutter,
+      alignment: evaluation.alignment,
+      contrast: evaluation.contrast,
+      isSaved: true,
     });
     setView("results");
     setActiveTab("evaluate"); // switch sidebar highlight to evaluate
@@ -256,9 +258,9 @@ export default function App() {
     }
   }
 
-  //Render 
+  //Render
 
-  // Guest / Logged out layout — no sidebar 
+  // Guest / Logged out layout — no sidebar
   if (!token) {
     return (
       <>
@@ -341,7 +343,7 @@ export default function App() {
     );
   }
 
-  //Logged in layout — with sidebar 
+  //Logged in layout — with sidebar
   return (
     <div className="app-layout">
       <Sidebar

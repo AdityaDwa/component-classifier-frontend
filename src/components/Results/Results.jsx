@@ -14,9 +14,9 @@ export default function Results({
 }) {
   const { imageUrl, components, clutter, alignment, contrast } = data;
 
-  const avg = Math.round(
-    (clutter.score + alignment.score + contrast.average_contrast) / 3,
-  );
+  // const avg = Math.round(
+  //   (clutter.score + alignment.score + contrast.average_contrast) / 3,
+  // );
 
   // Save button is visually different for guests to hint they need to sign in
   const saveBlocked = isGuest; // always prompt guests, regardless of timer
