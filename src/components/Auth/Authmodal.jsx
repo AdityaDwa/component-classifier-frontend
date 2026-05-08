@@ -107,7 +107,12 @@ function LoginForm({ onSuccess, onGoToSignup, signupSuccessEmail }) {
 
       {serverError && <div className="amodal-server-error">{serverError}</div>}
 
-      <form onSubmit={handleSubmit} noValidate className="amodal-form">
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="amodal-form"
+        autoComplete="off"
+      >
         <div className="amodal-field">
           <label className="amodal-label" htmlFor="m-login-email">
             Email <span className="amodal-required">*</span>
@@ -123,7 +128,6 @@ function LoginForm({ onSuccess, onGoToSignup, signupSuccessEmail }) {
               setErrors((p) => ({ ...p, email: "" }));
               setServerError("");
             }}
-            autoComplete="email"
           />
           <div className="amodal-error-msg">{errors.email}</div>
         </div>
@@ -144,7 +148,6 @@ function LoginForm({ onSuccess, onGoToSignup, signupSuccessEmail }) {
                 setErrors((p) => ({ ...p, password: "" }));
                 setServerError("");
               }}
-              autoComplete="current-password"
             />
             <button
               type="button"
@@ -476,7 +479,12 @@ function SignupForm({ onSignupComplete, onGoToLogin }) {
 }
 
 //Main AuthModal component
-export default function AuthModal({ reason, onSuccess, onDismiss }) {
+export default function AuthModal({
+  reason,
+  onSuccess,
+  onDismiss,
+  dismissable = true,
+}) {
   // three possible views inside the modal
   // "login" which shows login form
   // "signup" which shows signup form
@@ -490,6 +498,7 @@ export default function AuthModal({ reason, onSuccess, onDismiss }) {
   const reasonMessages = {
     timer: "Your guest session has ended. Sign in to keep your results.",
     save: "Sign in or create an account to save your results.",
+    expired: "Your session has expired. Please sign in again to continue.",
   };
 
   // called by SignupForm on success — no token, just account created
@@ -501,8 +510,9 @@ export default function AuthModal({ reason, onSuccess, onDismiss }) {
     setTimeout(() => setModalView("login"), 2500);
   }
 
-  // close on backdrop click
+  // only close on backdrop click if dismissable
   function handleBackdropClick(e) {
+    if (!dismissable) return; // ← block dismiss
     if (e.target === e.currentTarget) onDismiss();
   }
 
@@ -510,16 +520,22 @@ export default function AuthModal({ reason, onSuccess, onDismiss }) {
     <div className="amodal-backdrop" onClick={handleBackdropClick}>
       <div className="amodal-box" role="dialog" aria-modal="true">
         {/* close button — always visible */}
-        <button className="amodal-close" onClick={onDismiss} aria-label="Close">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path
-              d="M1 1l12 12M13 1L1 13"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
+        {dismissable && (
+          <button
+            className="amodal-close"
+            onClick={onDismiss}
+            aria-label="Close"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M1 1l12 12M13 1L1 13"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        )}
 
         {/* reason banner — only shown on login view when triggered by timer or save */}
         {modalView === "login" && reason && reasonMessages[reason] && (

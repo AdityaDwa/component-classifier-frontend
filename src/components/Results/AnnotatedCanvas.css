@@ -1,3 +1,4 @@
+/* design2 */
 .ac-wrapper {
   width: 100%;
 }
@@ -11,48 +12,45 @@
   cursor: crosshair;
 }
 
+/* ── Legend ───────────────────────────────────────────────────────────────── */
 .ac-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 10px;
 }
 
 .ac-legend-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 5px;
+  padding: 3px 9px;
   border-radius: 20px;
   border: 1px solid #e5e7eb;
   background: #fff;
   cursor: pointer;
-  transition:
-    border-color 0.12s,
-    background 0.12s;
+  transition: border-color 0.12s, background 0.12s;
   font-size: 0.75rem;
   color: #374151;
   user-select: none;
 }
 
-.ac-legend-item:hover {
+/* .ac-legend-item:hover {
   border-color: #6366f1;
   background: #f5f3ff;
   color: #4f46e5;
-}
+} */
 
-/* active = clicked/selected class — stays highlighted until clicked again */
 .ac-legend-item--active {
   border-color: #6366f1;
   background: #eef2ff;
   color: #4f46e5;
-  /* slightly thicker border to distinguish from hover */
   border-width: 1.5px;
 }
 
 .ac-legend-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -61,7 +59,6 @@
   font-weight: 500;
 }
 
-/* count badge — shows number of boxes for that class when > 1 */
 .ac-legend-count {
   background: #f3f4f6;
   color: #6b7280;
@@ -69,7 +66,6 @@
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 99px;
-  /* inherits color change from parent hover/active */
 }
 
 .ac-legend-item:hover .ac-legend-count,
@@ -82,79 +78,126 @@
 .ac-hint {
   font-size: 0.75rem;
   color: #9ca3af;
-  margin-top: 8px;
+  margin-top: 6px;
+  margin-bottom: 0.875rem;
   font-family: system-ui, sans-serif;
+}
+
+/* ── Individual component list ────────────────────────────────────────────── */
+.indi-comp {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0.875rem;
 }
 
 .indi-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 4px;
+  padding: 3px 10px;
   border-radius: 20px;
   border: 1px solid #e5e7eb;
   background: #fff;
   cursor: pointer;
-  transition:
-    border-color 0.12s,
-    background 0.12s;
+  transition: border-color 0.12s, background 0.12s;
   font-size: 0.75rem;
-  width: 5rem;
   color: #374151;
   user-select: none;
+  white-space: nowrap;
 }
 
-.indi-comp {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.indi-item:hover {
+/* .indi-item:hover {
   border-color: #6366f1;
   background: #f5f3ff;
   color: #4f46e5;
-}
+} */
 
-/* active = clicked/selected class — stays highlighted until clicked again */
 .indi-item--active {
   border-color: #6366f1;
   background: #eef2ff;
   color: #4f46e5;
-  /* slightly thicker border to distinguish from hover */
   border-width: 1.5px;
 }
 
+/* ── Component detail card ────────────────────────────────────────────────── */
 .detail-card {
-  margin-top: 2rem;
-  min-height: 8rem;
+  margin-top: 1rem;
 }
 
 .empty-detail {
-  min-height: 8rem;
+  min-height: 6rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-family: system-ui, sans-serif;
 }
 
 .detail-section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start !important;
+  gap: 0.75rem;
 }
 
 .head {
   text-transform: capitalize;
-  font-weight: 600;
-  font-size: 1.5rem;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  align-items: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #111;
+  font-family: system-ui, sans-serif;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .divider {
-  width: 100%;
-  height: 2px;
-  background: #e5e7eb;
+  display: none; /* handled by border-bottom on .head now */
+}
+
+/* detail aside rows */
+.detail-section aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-family: system-ui, sans-serif;
+}
+
+.detail-section aside > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.detail-section aside > div > span:first-child {
+  font-weight: 500;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.detail-section .title-issue {
+  font-weight: 400;
+  color: #111;
+  text-align: right;
+}
+
+.detail-section .issues {
+  flex-direction: column !important;
+  gap: 0.2rem !important;
+  align-items: flex-start !important;
+  margin-top: 0.25rem;
+}
+
+.detail-section .issues > span:first-child {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.detail-section .issues .title-issue {
+  text-align: left;
+  display: flex;
+  gap: 4px;
+  line-height: 1.5;
 }

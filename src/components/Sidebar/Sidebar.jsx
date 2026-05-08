@@ -91,7 +91,7 @@ export default function Sidebar({
               <rect width="28" height="28" rx="7" fill="#6366f1"/>
               <path d="M8 14h12M14 8v12" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/>
             </svg> */}
-            <span className="sidebar-logo-name">UI Eval</span>
+            <span className="sidebar-logo-name">UI Evaluator</span>
           </div>
         )}
         {/* collapse / expand toggle button */}
