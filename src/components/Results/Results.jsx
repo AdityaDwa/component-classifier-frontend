@@ -1,33 +1,36 @@
+// design2-----------------------------------------------------
+import { useState } from "react";
 import AnnotatedCanvas from "./AnnotatedCanvas";
 import ScoreCard from "./ScoreCard";
 import "./Results.css";
 
-// onSave      → called when Save button clicked (App handles guest check)
-// isGuest     → true if user is not logged in
-// sessionExpired → true if guest 25min timer has fired
 export default function Results({
   data,
   onBack,
   onSave,
   isGuest,
   sessionExpired,
+  alreadySaved,
 }) {
   const { imageUrl, components, clutter, alignment, contrast } = data;
 
-  // const avg = Math.round(
-  //   (clutter.score + alignment.score + contrast.average_contrast) / 3,
-  // );
+  // active tab for the score section — "clutter" | "alignment" | "colorContrast"
+  const [activeScore, setActiveScore] = useState("clutter");
 
-  // Save button is visually different for guests to hint they need to sign in
-  const saveBlocked = isGuest; // always prompt guests, regardless of timer
+  const saveBlocked = isGuest;
+
   const scoreEntries = [
-    { key: "clutter", val: clutter.score },
-    { key: "alignment", val: alignment.score * 100 },
-    { key: "colorContrast", val: contrast.average_contrast },
+    { key: "clutter", label: "Clutter", val: clutter.score },
+    { key: "alignment", label: "Alignment", val: alignment.score * 100 },
+    { key: "colorContrast", label: "Contrast", val: contrast.average_contrast },
   ];
+
+  // find the active score entry
+  const activeEntry = scoreEntries.find((e) => e.key === activeScore);
+
   return (
     <div className="res-page">
-      {/* Top bar */}
+      {/* ── Top bar ────────────────────────────────────────────────────── */}
       <div className="res-topbar">
         <button className="res-back-btn" onClick={onBack} type="button">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -43,24 +46,56 @@ export default function Results({
         </button>
 
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          {/* Overall score */}
-          <div className="res-overall">
-            {/* <span className="res-overall-label">Overall score</span>
-            <span className="res-overall-score">
-              {avg}
-              <span className="res-overall-max">/100</span>
-            </span> */}
+          {/* score pills summary — quick glance at all three */}
+          <div className="res-score-pills">
+            {scoreEntries.map(({ key, label, val }) => (
+              <button
+                key={key}
+                className={`res-score-pill ${activeScore === key ? "res-score-pill--active" : ""}`}
+                onClick={() => setActiveScore(key)}
+                type="button"
+              >
+                <span className="res-score-pill-label">{label}</span>
+                <span className="res-score-pill-val">{val.toFixed(1)}</span>
+              </button>
+            ))}
           </div>
 
           {/* Save button */}
           <button
-            className={`res-save-btn ${saveBlocked ? "res-save-btn--guest" : ""} ${data.isSaved ? "res-save-btn--disabled" : ""}`}
+            className={`res-save-btn ${saveBlocked || alreadySaved ? "res-save-btn--guest" : ""}`}
             onClick={onSave}
             type="button"
-            disabled={data.isSaved}
-            title={saveBlocked ? "Sign in to save your results" : "Save result"}
+            disabled={alreadySaved || data.isSaved}
+            title={
+              alreadySaved || data.isSaved
+                ? "Already saved"
+                : saveBlocked
+                  ? "Sign in to save your results"
+                  : "Save result"
+            }
           >
-            {saveBlocked ? (
+            {alreadySaved || data.isSaved ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle
+                    cx="7"
+                    cy="7"
+                    r="6"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                  />
+                  <path
+                    d="M4 7l2 2 4-4"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Saved
+              </>
+            ) : saveBlocked ? (
               <>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <rect
@@ -103,7 +138,7 @@ export default function Results({
         </div>
       </div>
 
-      {/* Session expired banner — shown to guests after 25min */}
+      {/* session expired banner */}
       {isGuest && sessionExpired && (
         <div className="res-expired-banner">
           Your guest session has ended. Sign in to save your results or evaluate
@@ -111,8 +146,9 @@ export default function Results({
         </div>
       )}
 
+      {/* ── Main two-column layout ─────────────────────────────────────── */}
       <div className="res-layout">
-        {/* Left — annotated image */}
+        {/* ── LEFT — canvas (wider) ──────────────────────────────────── */}
         <section className="res-image-section">
           <div className="res-section-title">
             <span className="res-section-icon">
@@ -139,56 +175,38 @@ export default function Results({
             <span className="res-count-badge">{components.length}</span>
           </div>
           <p className="res-section-sub">
-            Hover a label or box to highlight it
+            Hover a box to inspect · Click a legend label to highlight all of
+            that type
           </p>
           <AnnotatedCanvas imageUrl={imageUrl} components={components} />
         </section>
 
-        {/* Right — scores */}
+        {/* ── RIGHT — score tabs (narrower, sticky) ─────────────────── */}
         <section className="res-scores-section">
-          <div className="res-section-title">
-            <span className="res-section-icon">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path
-                  d="M2 11l3.5-4 3 2.5L12 4"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-            UI quality scores
-          </div>
-          {/* <p className="res-section-sub">Each criterion is rated out of 100</p> */}
-
-          <div className="res-scores-list">
-            {scoreEntries.map(({ key, val }) => (
-              <ScoreCard key={key} criteriaKey={key} score={val} data={data} />
+          {/* tab switcher */}
+          <div className="res-score-tabs">
+            {scoreEntries.map(({ key, label, val }) => (
+              <button
+                key={key}
+                className={`res-score-tab ${activeScore === key ? "res-score-tab--active" : ""}`}
+                onClick={() => setActiveScore(key)}
+                type="button"
+              >
+                <span className="res-score-tab-label">{label}</span>
+                <span className="res-score-tab-val">{val.toFixed(1)}</span>
+              </button>
             ))}
           </div>
 
-          {/* Summary strip */}
-          {/* <div className="res-summary">
-            <div className="res-summary-row">
-              <span>Clutter</span>
-              <span className="res-summary-val">{clutter.score}</span>
-            </div>
-            <div className="res-summary-row">
-              <span>Alignment</span>
-              <span className="res-summary-val">{alignment.score}</span>
-            </div>
-            <div className="res-summary-row">
-              <span>Color Contrast</span>
-              <span className="res-summary-val">
-                {contrast.average_contrast}
-              </span>
-            </div>
-            <div className="res-summary-row res-summary-total">
-              <span>Average</span>
-              <span className="res-summary-val">{avg}</span>
-            </div>
-          </div> */}
+          {/* only the active score card renders */}
+          <div className="res-score-content">
+            <ScoreCard
+              key={activeScore}
+              criteriaKey={activeScore}
+              score={activeEntry.val}
+              data={data}
+            />
+          </div>
         </section>
       </div>
     </div>

@@ -1,52 +1,24 @@
+/* design2 */
 .sc-card {
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   padding: 1.25rem;
   display: flex;
-  /* align-items: center; */
   flex-direction: column;
-  gap: 1.25rem;
-  transition: box-shadow 0.15s;
-}
-
-.sc-card section {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-.sc-card aside {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  justify-content: start;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #111;
-}
-
-.issue-number {
-  font-weight: 600;
-}
-
-.title-issue {
-  font-weight: 300;
-}
-
-.sc-card aside div {
-  display: flex;
   gap: 1rem;
-}
-
-.issues {
-  flex-direction: column;
-  gap: 0.1rem !important;
-  margin-bottom: 0.5rem;
+  transition: box-shadow 0.15s;
 }
 
 .sc-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+/* ── Ring + label row ─────────────────────────────────────────────────────── */
+.sc-card section {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
 }
 
 /* Ring */
@@ -69,18 +41,18 @@
   pointer-events: none;
 }
 .sc-score {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #111;
   line-height: 1;
 }
 .sc-out {
-  font-size: 0.6875rem;
+  font-size: 0.7rem;
   color: #9ca3af;
   margin-top: 2px;
 }
 
-/* Info */
+/* Info beside ring */
 .sc-info {
   flex: 1;
   min-width: 0;
@@ -96,25 +68,15 @@
   font-weight: 600;
   color: #111;
 }
-.sc-grade {
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 6px;
-  border: 1px solid;
-  letter-spacing: 0.05em;
-}
 .sc-desc {
   font-size: 0.8125rem;
   color: #6b7280;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   line-height: 1.5;
 }
-
-/* Progress bar */
 .sc-bar-track {
   width: 100%;
-  height: 5px;
+  height: 4px;
   background: #f3f4f6;
   border-radius: 99px;
   overflow: hidden;
@@ -123,4 +85,61 @@
   height: 100%;
   border-radius: 99px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Breakdown aside ──────────────────────────────────────────────────────── */
+.sc-card aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: #374151;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 0.875rem;
+}
+
+.sc-card aside div {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.sc-card aside div > span:first-child {
+  font-weight: 500;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.title-issue {
+  font-weight: 400;
+  color: #111;
+  text-align: right;
+}
+
+/* issues / suggestions — stacked vertically */
+.issues {
+  flex-direction: column !important;
+  gap: 0.2rem !important;
+  align-items: flex-start !important;
+  margin-top: 0.25rem;
+}
+
+.issues > span:first-child {
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.issues .title-issue {
+  text-align: left;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  display: flex;
+  gap: 4px;
+}
+
+.issue-number {
+  font-weight: 600;
+  flex-shrink: 0;
 }

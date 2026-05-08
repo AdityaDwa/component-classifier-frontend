@@ -11,19 +11,6 @@ import "./App.css";
 //Constant
 const GUEST_TIMER_MS = 25 * 60 * 1000;
 
-//Mock backend response
-const MOCK_RESPONSE = {
-  imageUrl: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800",
-  components: [
-    { id: 1, label: "Navbar", x: 0.0, y: 0.0, width: 1.0, height: 0.08 },
-    { id: 2, label: "Hero Button", x: 0.35, y: 0.42, width: 0.3, height: 0.09 },
-    { id: 3, label: "Input Field", x: 0.1, y: 0.25, width: 0.5, height: 0.07 },
-    { id: 4, label: "Card", x: 0.05, y: 0.55, width: 0.4, height: 0.3 },
-    { id: 5, label: "Sidebar", x: 0.75, y: 0.1, width: 0.22, height: 0.85 },
-  ],
-  scores: { clutter: 72, alignment: 88, colorContrast: 65 },
-};
-
 //Guest helpers
 function getOrCreateGuestId() {
   let id = localStorage.getItem("guestId");
@@ -41,6 +28,7 @@ function clearGuestId() {
 export default function App() {
   //Auth
   const [token, setToken] = useState(() => localStorage.getItem("accessToken"));
+  const [tokenExpired, setTokenExpired] = useState(false);
 
   //Guest
   const [guestId, setGuestId] = useState(() => localStorage.getItem("guestId"));
@@ -73,6 +61,11 @@ export default function App() {
   //Saved evaluations
   const [savedEvaluations, setSavedEvaluations] = useState([]);
 
+  //login session expiry
+  const [sessionExpiredDialog, setSessionExpiredDialog] = useState(false);
+
+  const previousResultsRef = useRef(null);
+
   // cleanup timer on unmount
   useEffect(() => {
     return () => {
@@ -80,6 +73,23 @@ export default function App() {
     };
   }, []);
 
+  async function authFetch(url, options = {}) {
+    const res = await fetch(url, options);
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : {};
+
+    if (
+      res.status === 401 &&
+      data.message === "Access token expired.Please login again"
+    ) {
+      previousResultsRef.current = results;
+      setTokenExpired(true);
+      setSessionExpiredDialog(true);
+
+      return null;
+    }
+    return { res, data };
+  }
   //Guest timer
   function startGuestTimer() {
     if (guestTimerRef.current) return;
@@ -116,6 +126,11 @@ export default function App() {
     setSessionExpired(false);
     setShowAuthModal(false);
     setModalReason(null);
+    if (previousResultsRef.current) {
+      setResults(previousResultsRef.current);
+      setView("results");
+      previousResultsRef.current = null;
+    }
   }
 
   function handleLogout() {
@@ -141,7 +156,15 @@ export default function App() {
       setShowAuthModal(true);
       return;
     }
-
+    // logged in — pre-flight token check before attempting file upload
+    // this catches expired tokens before the multipart request(file upload) is made
+    if (token) {
+      const check = await authFetch("/api/v1/users/ping", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!check) return;
+    }
     setLoading(true);
     setError(null);
 
@@ -158,12 +181,13 @@ export default function App() {
         headers["x-guest-id"] = id;
         startGuestTimer();
       }
-      const res = await fetch("/api/v1/images/upload", {
+      const result = await authFetch("/api/v1/images/upload", {
         method: "POST",
         body: formData,
         headers,
       });
-      const data = await res.json();
+      if (!result) return;
+      const { res, data } = result;
       console.log(res.status);
       if (!res.ok) throw new Error(data.message);
       console.log(data.data);
@@ -183,12 +207,20 @@ export default function App() {
       setShowAuthModal(true);
       return;
     }
+    const alreadySaved = savedEvaluations.some(
+      (evaluation) => evaluation._id === results._id,
+    );
+
+    if (alreadySaved) {
+      setError("This evaluation has already been saved.");
+      return;
+    }
     // logged in user
     setShowSaveDialog(true);
   }
   async function handleSaveConfirm(name) {
     try {
-      const res = await fetch(`/api/v1/images/save/${results._id}`, {
+      const result = await authFetch(`/api/v1/images/save/${results._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -196,10 +228,13 @@ export default function App() {
         },
         body: JSON.stringify({ savedName: name }),
       });
-      const data = await res.json();
+
+      if (!result) return;
+      const { res, data } = result;
       if (!res.ok) {
         throw new Error(data.message);
       }
+      setSavedEvaluations((prev) => [data.data, ...prev]);
       setShowSaveDialog(false);
     } catch (err) {
       setError(err.message || "Something went wrong.Try again");
@@ -224,13 +259,14 @@ export default function App() {
   //Delete a saved evaluation
   async function handleDeleteSaved(id) {
     try {
-      const res = await fetch(`/api/v1/images/${id}`, {
+      const result = await authFetch(`/api/v1/images/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data = await res.json();
+      if (!result) return;
+      const { res, data } = result;
       if (!res.ok) throw new Error(data.message);
       setSavedEvaluations((prev) =>
         prev.filter((evaluation) => evaluation._id !== id),
@@ -244,17 +280,18 @@ export default function App() {
   async function handleTabChange(tab) {
     setActiveTab(tab);
     // when switching to evaluate reset to upload
-    if (tab === "evaluate") {
-      setView("upload");
-      setResults(null);
-    }
+    // if (tab === "evaluate") {
+    //   setView("upload");
+    //   setResults(null);
+    // }
     if (tab === "saved") {
-      const res = await fetch("/api/v1/images/saved", {
+      const result = await authFetch("/api/v1/images/saved", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      setSavedEvaluations(data.data);
+      if (!result) return;
+      const { res, data } = result;
+      setSavedEvaluations(data.data || []);
     }
   }
 
@@ -267,7 +304,7 @@ export default function App() {
         {/* top bar */}
         <div
           style={{
-            position: "fixed",
+            position: "absolute",
             top: 16,
             right: 20,
             zIndex: 100,
@@ -310,7 +347,6 @@ export default function App() {
             Sign in
           </button>
         </div>
-
         {view === "upload" && (
           <FileUpload
             onUpload={handleEvaluate}
@@ -336,7 +372,8 @@ export default function App() {
           <AuthModal
             reason={modalReason}
             onSuccess={handleLoginSuccess}
-            onDismiss={handleModalDismiss}
+            onDismiss={modalReason === "expired" ? null : handleModalDismiss}
+            dismissable={modalReason !== "expired"}
           />
         )}
       </>
@@ -353,7 +390,6 @@ export default function App() {
         collapsed={sidebarCollapsed}
         onToggleCollapse={handleToggleCollapse}
       />
-
       <main className="app-main">
         {/* evaluate tab */}
         {activeTab === "evaluate" && view === "upload" && (
@@ -374,6 +410,7 @@ export default function App() {
             onSave={handleSaveClick}
             isGuest={false}
             sessionExpired={false}
+            alreadySaved={savedEvaluations.some((e) => e._id === results?._id)}
           />
         )}
 
@@ -386,7 +423,6 @@ export default function App() {
           />
         )}
       </main>
-
       {/* save name dialog */}
       {showSaveDialog && (
         <SaveDialog
@@ -394,6 +430,108 @@ export default function App() {
           onCancel={() => setShowSaveDialog(false)}
         />
       )}
+      {/*used when jwt token expires in logged in session*/}
+      {sessionExpiredDialog && (
+        <SessionExpiredDialog
+          onSignIn={() => {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            setToken(null);
+            setTokenExpired(false);
+            setSessionExpiredDialog(false);
+            setModalReason("expired");
+            setShowAuthModal(true);
+            setView("upload");
+          }}
+        />
+      )}
+      {showAuthModal && (
+        <AuthModal
+          reason={modalReason}
+          onSuccess={handleLoginSuccess}
+          onDismiss={handleModalDismiss}
+        />
+      )}
+    </div>
+  );
+}
+function SessionExpiredDialog({ onSignIn }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 2000, // above everything including AuthModal
+        padding: "1rem",
+      }}
+    >
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: "14px",
+          padding: "2rem 1.75rem",
+          maxWidth: "380px",
+          width: "100%",
+          textAlign: "center",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        {/* icon */}
+        <div style={{ marginBottom: "1rem" }}>
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="19" stroke="#f59e0b" strokeWidth="1.5" />
+            <path
+              d="M20 12v9M20 27v2"
+              stroke="#f59e0b"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+
+        <h2
+          style={{
+            fontSize: "1.125rem",
+            fontWeight: 700,
+            color: "#111",
+            margin: "0 0 8px",
+          }}
+        >
+          Session expired
+        </h2>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "#6b7280",
+            margin: "0 0 1.5rem",
+            lineHeight: 1.5,
+          }}
+        >
+          Your login session has expired. Please sign in again to continue.
+        </p>
+
+        <button
+          onClick={onSignIn}
+          style={{
+            width: "100%",
+            height: "42px",
+            background: "#6366f1",
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            fontSize: "0.9375rem",
+            fontWeight: 500,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          Sign in again
+        </button>
+      </div>
     </div>
   );
 }

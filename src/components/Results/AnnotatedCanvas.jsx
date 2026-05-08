@@ -120,9 +120,9 @@ export default function AnnotatedCanvas({ imageUrl, components }) {
         // else                          → all boxes full opacity
         let alpha = 1;
         if (activeClass !== null) {
-          alpha = comp.class === activeClass ? 1 : 0.2;
+          alpha = comp.class === activeClass ? 1 : 0.1;
         } else if (hoveredId !== null) {
-          alpha = comp.id === hoveredId ? 1 : 0.35;
+          alpha = comp.id === hoveredId ? 1 : 0.1;
         }
 
         ctx.globalAlpha = alpha;
@@ -197,18 +197,27 @@ export default function AnnotatedCanvas({ imageUrl, components }) {
 
   // ── Legend click — toggle active class ───────────────────────────────────
   function handleLegendClick(label) {
+    setHoveredId(null);
     // clicking the already-active class deselects it
     setActiveClass((prev) => (prev === label ? null : label));
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="ac-wrapper" ref={wrapperRef}>
+    <div
+      className="ac-wrapper"
+      ref={wrapperRef}
+      onClick={() => {
+        setActiveClass(null);
+        setHoveredId(null);
+      }}
+    >
       <canvas
         ref={canvasRef}
         className="ac-canvas"
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setHoveredId(null)}
+        onClick={(e) => e.stopPropagation()}
       />
       {/* legend — one pill per unique class found in this image */}
       <div className="ac-legend">
@@ -221,7 +230,10 @@ export default function AnnotatedCanvas({ imageUrl, components }) {
             <div
               key={label}
               className={`ac-legend-item ${isActive ? "ac-legend-item--active" : ""}`}
-              onClick={() => handleLegendClick(label)}
+              onClick={(e) => {
+                e.stopPropagation(); //prevent bubble to wrapper
+                handleLegendClick(label);
+              }}
               title={`Click to highlight all ${label} elements`}
             >
               <span className="ac-legend-dot" style={{ background: color }} />
@@ -239,10 +251,12 @@ export default function AnnotatedCanvas({ imageUrl, components }) {
         {components.map((comp, index) => (
           <div
             key={comp.id}
-            onClick={() =>
-              setHoveredId((prev) => (prev === comp.id ? null : comp.id))
-            }
-            className="indi-item"
+            onClick={(e) => {
+              e.stopPropagation(); //prevent bubble to wrapper
+              setActiveClass(null);
+              setHoveredId((prev) => (prev === comp.id ? null : comp.id));
+            }}
+            className={`indi-item ${hoveredId === comp.id ? "indi-item--active" : ""}`}
           >
             {comp.class}#{comp.id}
           </div>
