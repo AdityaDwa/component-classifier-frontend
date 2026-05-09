@@ -101,11 +101,21 @@ export default function ScoreCard({ criteriaKey, score, data }) {
       <div className="sc-card">
         <section>
           <div className="sc-ring-wrap">
-            <ArcRing score={score} color={meta.color} track={meta.track} />
-            <div className="sc-ring-center">
-              <span className="sc-score">{score.toFixed(2)}</span>
-              <span className="sc-out">/ 100</span>
-            </div>
+            {criteriaKey === "colorContrast" ? (
+              // plain number instead of arc ring
+              <div className="sc-ring-center sc-ring-plain">
+                <span className="sc-score">{score.toFixed(2)}</span>
+              </div>
+            ) : (
+              // arc ring for clutter and alignment
+              <>
+                <ArcRing score={score} color={meta.color} track={meta.track} />
+                <div className="sc-ring-center">
+                  <span className="sc-score">{score.toFixed(2)}</span>
+                  <span className="sc-out">/ 100</span>
+                </div>
+              </>
+            )}
           </div>
           <div className="sc-info">
             <div className="sc-header">
@@ -122,12 +132,14 @@ export default function ScoreCard({ criteriaKey, score, data }) {
               </span> */}
             </div>
             <p className="sc-desc">{meta.description}</p>
-            <div className="sc-bar-track">
-              <div
-                className="sc-bar-fill"
-                style={{ width: `${score}%`, background: meta.color }}
-              />
-            </div>
+            {criteriaKey !== "colorContrast" && (
+              <div className="sc-bar-track">
+                <div
+                  className="sc-bar-fill"
+                  style={{ width: `${score}%`, background: meta.color }}
+                />
+              </div>
+            )}
           </div>
         </section>
         {criteriaKey == "clutter" && (

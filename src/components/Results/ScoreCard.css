@@ -31,6 +31,18 @@
 .sc-ring {
   display: block;
 }
+.sc-ring-plain {
+  position: static;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border-radius: 50%;
+  border: 2px solid #fef3c7;
+}
 .sc-ring-center {
   position: absolute;
   inset: 0;
