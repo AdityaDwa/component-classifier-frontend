@@ -195,6 +195,7 @@ export default function App() {
       setView("results");
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
+      setTimeout(() => setError(null), 4000);
     } finally {
       setLoading(false);
     }
@@ -353,6 +354,7 @@ export default function App() {
             loading={loading}
             error={error}
             submitLabel="Evaluate"
+            onFileSelect={() => setError(null)}
           />
         )}
         {view === "results" && results && (
@@ -398,6 +400,7 @@ export default function App() {
             loading={loading}
             error={error}
             submitLabel="Evaluate"
+            onFileSelect={() => setError(null)}
           />
         )}
         {activeTab === "evaluate" && view === "results" && results && (
