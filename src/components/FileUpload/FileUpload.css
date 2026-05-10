@@ -1,3 +1,4 @@
+/* design2 */
 .fu-page {
   max-width: 720px;
   margin: 0 auto;
@@ -45,6 +46,19 @@
   background: #eef2ff;
 }
 
+/* when a file is loaded — remove padding, show image flush */
+.fu-dropzone--has-file {
+  padding: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+  background: #000;
+  overflow: hidden;
+}
+.fu-dropzone--has-file:hover {
+  border-color: #e5e7eb;
+  background: #000;
+}
+
 .fu-dropzone__icon {
   color: #9ca3af;
   margin-bottom: 0.875rem;
@@ -84,6 +98,7 @@
   transition:
     border-color 0.12s,
     background 0.12s;
+  font-family: inherit;
 }
 .fu-browse-btn:hover {
   border-color: #6366f1;
@@ -91,7 +106,98 @@
   background: #f5f3ff;
 }
 
-/* Error messages */
+/* ── Preview inside dropzone ──────────────────────────────────────────────── */
+.fu-preview {
+  position: relative;
+  width: 100%;
+}
+
+.fu-preview__img {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* overlay bar at the bottom of the preview */
+.fu-preview__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, transparent 100%);
+  padding: 1.5rem 1rem 0.875rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-radius: 0 0 10px 10px;
+}
+
+.fu-preview__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fu-preview__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.fu-preview__size {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fu-preview__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fu-preview__change {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s;
+  backdrop-filter: blur(4px);
+}
+.fu-preview__change:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.fu-preview__remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.12s;
+  backdrop-filter: blur(4px);
+}
+.fu-preview__remove:hover {
+  background: rgba(239, 68, 68, 0.6);
+}
+
+/* ── Error messages ───────────────────────────────────────────────────────── */
 .fu-errors {
   margin-top: 0.875rem;
 }
@@ -105,84 +211,7 @@
   margin: 4px 0;
 }
 
-/* File grid */
-.fu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
-  margin-top: 1.5rem;
-}
-
-/* File card */
-.fu-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-  transition: box-shadow 0.12s;
-}
-.fu-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-.fu-card__thumb {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  display: block;
-}
-.fu-card__placeholder {
-  width: 100%;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f3f4f6;
-  font-size: 2rem;
-}
-.fu-card__info {
-  padding: 6px 8px 8px;
-}
-.fu-card__name {
-  display: block;
-  font-size: 0.75rem;
-  color: #374151;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.fu-card__size {
-  display: block;
-  font-size: 0.6875rem;
-  color: #9ca3af;
-  margin-top: 2px;
-}
-
-/* Remove button */
-.fu-card__remove {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.55);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  opacity: 0;
-  transition: opacity 0.12s;
-  padding: 0;
-}
-.fu-card:hover .fu-card__remove {
-  opacity: 1;
-}
-
-/* Footer */
+/* ── Footer ───────────────────────────────────────────────────────────────── */
 .fu-footer {
   margin-top: 1.25rem;
   display: flex;
@@ -194,28 +223,6 @@
 .fu-footer__count {
   font-size: 0.875rem;
   color: #6b7280;
-}
-.fu-footer__actions {
-  display: flex;
-  gap: 8px;
-}
-
-.fu-clear-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  font-size: 0.875rem;
-  color: #6b7280;
-  cursor: pointer;
-  transition:
-    border-color 0.12s,
-    color 0.12s;
-  font-family: inherit;
-}
-.fu-clear-btn:hover {
-  border-color: #d1d5db;
-  color: #374151;
 }
 
 .fu-upload-btn {

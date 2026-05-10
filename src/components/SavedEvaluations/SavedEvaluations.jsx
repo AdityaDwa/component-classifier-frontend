@@ -115,13 +115,13 @@ export default function SavedEvaluations({ evaluations, onOpen, onDelete }) {
                 <span className="se-card-score-item">
                   <span className="se-card-score-label">Align</span>
                   <span className="se-card-score-val">
-                    {evaluation.alignment.score}
+                    {evaluation.alignment.score * 100}
                   </span>
                 </span>
                 <span className="se-card-score-item">
                   <span className="se-card-score-label">Contrast</span>
                   <span className="se-card-score-val">
-                    {evaluation.contrast.avg_contrast}
+                    {evaluation.contrast.average_contrast}
                   </span>
                 </span>
               </div>
