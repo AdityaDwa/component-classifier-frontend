@@ -120,9 +120,9 @@ export default function AnnotatedCanvas({ imageUrl, components }) {
         // else                          → all boxes full opacity
         let alpha = 1;
         if (activeClass !== null) {
-          alpha = comp.class === activeClass ? 1 : 0.1;
+          alpha = comp.class === activeClass ? 1 : 0;
         } else if (hoveredId !== null) {
-          alpha = comp.id === hoveredId ? 1 : 0.1;
+          alpha = comp.id === hoveredId ? 1 : 0;
         }
 
         ctx.globalAlpha = alpha;
