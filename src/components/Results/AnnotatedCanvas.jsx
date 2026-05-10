@@ -163,7 +163,7 @@ export default function AnnotatedCanvas({ imageUrl, components }) {
     };
   }, [imageUrl, components, hoveredId, activeClass]);
 
-  // ── Canvas hit test — individual box hover ────────────────────────────────
+  // ── Canvas hit test — individual box hover (currently not in use)────────────────────────────────
   const handleMouseMove = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -215,8 +215,8 @@ export default function AnnotatedCanvas({ imageUrl, components }) {
       <canvas
         ref={canvasRef}
         className="ac-canvas"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => setHoveredId(null)}
+        // onMouseMove={handleMouseMove}
+        // onMouseLeave={() => setHoveredId(null)}
         onClick={(e) => e.stopPropagation()}
       />
       {/* legend — one pill per unique class found in this image */}
