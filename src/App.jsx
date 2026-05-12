@@ -159,10 +159,13 @@ export default function App() {
     // logged in — pre-flight token check before attempting file upload
     // this catches expired tokens before the multipart request(file upload) is made
     if (token) {
-      const check = await authFetch("/api/v1/users/ping", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const check = await authFetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/users/ping`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (!check) return;
     }
     setLoading(true);
@@ -181,11 +184,14 @@ export default function App() {
         headers["x-guest-id"] = id;
         startGuestTimer();
       }
-      const result = await authFetch("/api/v1/images/upload", {
-        method: "POST",
-        body: formData,
-        headers,
-      });
+      const result = await authFetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/images/upload`,
+        {
+          method: "POST",
+          body: formData,
+          headers,
+        },
+      );
       if (!result) return;
       const { res, data } = result;
       console.log(res.status);
@@ -221,14 +227,17 @@ export default function App() {
   }
   async function handleSaveConfirm(name) {
     try {
-      const result = await authFetch(`/api/v1/images/save/${results._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const result = await authFetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/images/save/${results._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ savedName: name }),
         },
-        body: JSON.stringify({ savedName: name }),
-      });
+      );
 
       if (!result) return;
       const { res, data } = result;
@@ -260,12 +269,15 @@ export default function App() {
   //Delete a saved evaluation
   async function handleDeleteSaved(id) {
     try {
-      const result = await authFetch(`/api/v1/images/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const result = await authFetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/images/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       if (!result) return;
       const { res, data } = result;
       if (!res.ok) throw new Error(data.message);
@@ -286,10 +298,13 @@ export default function App() {
     //   setResults(null);
     // }
     if (tab === "saved") {
-      const result = await authFetch("/api/v1/images/saved", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const result = await authFetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/images/saved`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (!result) return;
       const { res, data } = result;
       setSavedEvaluations(data.data || []);

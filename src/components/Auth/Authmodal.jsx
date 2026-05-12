@@ -66,14 +66,17 @@ function LoginForm({ onSuccess, onGoToSignup, signupSuccessEmail }) {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-guest-id": localStorage.getItem("guestId"),
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/users/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-guest-id": localStorage.getItem("guestId"),
+          },
+          body: JSON.stringify({ email: email.trim(), password }),
         },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
+      );
       const data = await res.json();
       if (!res.ok) {
         setServerError(data.message || "Login failed. Please try again.");
@@ -253,18 +256,21 @@ function SignupForm({ onSignupComplete, onGoToLogin }) {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-guest-id": localStorage.getItem("guestId"),
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/users/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-guest-id": localStorage.getItem("guestId"),
+          },
+          body: JSON.stringify({
+            username: username.trim(),
+            email: email.trim(),
+            password,
+          }),
         },
-        body: JSON.stringify({
-          username: username.trim(),
-          email: email.trim(),
-          password,
-        }),
-      });
+      );
       const data = await res.json();
       if (!res.ok) {
         setServerError(data.message || "Signup failed. Please try again.");
