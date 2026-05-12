@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import FileUpload from "./components/FileUpload/FileUpload.jsx";
 import Results from "./components/Results/Results.jsx";
-import AuthModal from "./components/Auth/AuthModal.jsx";
+import AuthModal from "./components/Auth/Authmodal.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import SaveDialog from "./components/SaveDialog/SaveDialog.jsx";
 import SavedEvaluations from "./components/SavedEvaluations/SavedEvaluations.jsx";

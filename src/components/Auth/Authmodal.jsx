@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./AuthModal.css";
+import "./Authmodal.css";
 
 // ── Validation ────────────────────────────────────────────────────────────────
 function validateLogin(email, password) {
