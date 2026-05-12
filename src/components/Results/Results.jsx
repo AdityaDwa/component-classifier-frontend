@@ -1,7 +1,7 @@
 // design2-----------------------------------------------------
 import { useState } from "react";
-import AnnotatedCanvas from "./AnnotatedCanvas";
-import ScoreCard from "./ScoreCard";
+import AnnotatedCanvas from "./AnnotatedCanvas.jsx";
+import ScoreCard from "./ScoreCard.jsx";
 import "./Results.css";
 
 export default function Results({

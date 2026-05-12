@@ -1,11 +1,11 @@
 //state of app after the logged in users tab addition (sidebar saved evaluations)
 import { useState, useRef, useEffect } from "react";
-import FileUpload from "./components/FileUpload/FileUpload";
-import Results from "./components/Results/Results";
-import AuthModal from "./components/Auth/AuthModal";
-import Sidebar from "./components/Sidebar/Sidebar";
-import SaveDialog from "./components/SaveDialog/SaveDialog";
-import SavedEvaluations from "./components/SavedEvaluations/SavedEvaluations";
+import FileUpload from "./components/FileUpload/FileUpload.jsx";
+import Results from "./components/Results/Results.jsx";
+import AuthModal from "./components/Auth/AuthModal.jsx";
+import Sidebar from "./components/Sidebar/Sidebar.jsx";
+import SaveDialog from "./components/SaveDialog/SaveDialog.jsx";
+import SavedEvaluations from "./components/SavedEvaluations/SavedEvaluations.jsx";
 import "./App.css";
 
 //Constant
